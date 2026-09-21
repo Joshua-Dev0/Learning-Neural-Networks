@@ -1,0 +1,5 @@
+MNIST Neural Network
+
+# 1 hidden layer (64x64)
+# Input layer 784 rows
+# Output layer 10 rows
