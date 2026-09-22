@@ -32,11 +32,11 @@ print(labels)
 # print("\nPixels:")
 # print(pixels)
 
-# #First row of pixels
-# row = 3
-# first_row_pixels = df[row, 1:]
-# print("First Row Pixels:")
-# print(first_row_pixels)
+#First row of pixels
+row = 3
+first_row_pixels = df[row, 1:]
+print("First Row Pixels:")
+print(first_row_pixels)
 
 # num_rows = df.height
 # print("Number of columns:", num_rows)  # For MNIST, this will be 10000
