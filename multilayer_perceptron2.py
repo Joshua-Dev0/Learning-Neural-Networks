@@ -150,14 +150,14 @@ def main():
       print("Prediction Accuracy: ", accuracy(A2, Y_onehot))
       
       #debug
-      print("X: ", X.shape)
-      print("W1:", W1.shape)
-      print("Z1:", Z1.shape)
-      print("A1:", A1.shape)
-      print("W2:", W2.shape)
-      print("Z2:", Z2.shape)
-      print("A2:", A2.shape)
-      print("Y: ", Y_onehot.shape)
+      # print("X: ", X.shape)
+      # print("W1:", W1.shape)
+      # print("Z1:", Z1.shape)
+      # print("A1:", A1.shape)
+      # print("W2:", W2.shape)
+      # print("Z2:", Z2.shape)
+      # print("A2:", A2.shape)
+      # print("Y: ", Y_onehot.shape)
       
       #Results
       print("Probabilities:")
