@@ -8,8 +8,9 @@ csv_path = os.path.join(SCRIPT_DIR, "mnist_train.csv")
 df = pl.read_csv(csv_path)
 
 num_rows = df.height
+num_columns = df.width - 1
 pixel_matrix = df.drop("label").to_numpy()
-pixel_matrix_norm = pixel_matrix / 255.0   #Normalize your pixel data
+pixel_matrix_norm = pixel_matrix / 255.0   #Normalize your pixel data, squishing numbers to be between 0 and 1
 
 def initparams():
     low_bound = -0.1
@@ -48,7 +49,7 @@ def one_hot(label: int) -> np.ndarray:
     
     return array
 
-def compute_cost(A2: np.ndarray, Y_one_hot: np.ndarray):
+def cost_func(A2: np.ndarray, Y_one_hot: np.ndarray):
     # 1. Prevent log(0) errors which yield NaN (Not a Number) crashes
     epsilon = 1e-15
     # 1.0 - epsilon is the ceiling height, i.e 0.999999999
@@ -64,15 +65,29 @@ def compute_cost(A2: np.ndarray, Y_one_hot: np.ndarray):
 def accuracy_check(result: np.ndarray, onehot: np.ndarray):
     return np.sum(result == onehot) / onehot.shape[0]
 
+def update_params(
+    W1: np.ndarray, 
+    B1: np.ndarray, 
+    W2: np.ndarray, 
+    B2: np.ndarray, 
+    dW1: np.ndarray, 
+    dB1: np.ndarray, 
+    dW2: np.ndarray, 
+    dB2: np.ndarray,
+    learn_rate,
+):
+    
+    return W1, B1, W2, B2
+
 
 def forward_propagation(X: np.ndarray, W1: np.ndarray, B1: np.ndarray, W2: np.ndarray, B2: np.ndarray):
 
     # Pass 1: Hidden Layer calculation (Outputs a 64x1 matrix)
-    Z1 = (W1 @ X) + B1
+    Z1 = (W1 @ X) + B1  # ([64x784] * [784x1]) + [64x1] = [64x1]
     A1 = relu(Z1)  
     
     # Pass 2: Output Layer calculation (Outputs a 10x1 matrix)
-    Z2 = (W2 @ A1) + B2  # (10, 64) @ (64, 1) + (10, 1) = (10, 1)
+    Z2 = (W2 @ A1) + B2  # ([10x64] * [64, 1]) + [10x1] = [10x1]
     A2 = softmax(Z2)     # Scales the 10 raw digits scores into probabilities
     
     return A2, Z2, A1, Z1
@@ -81,16 +96,22 @@ def backward_propagation(i, X: np.ndarray, W1: np.ndarray, B1: np.ndarray, W2: n
 
     # i for every row(every single image)
     A2, Z2, A1, Z1 = forward_propagation(X, pixel_matrix_norm, W1, B1, W2, B2)
-    cost = compute_cost(A2, one_hot(df[i, 0]))
-    
 
-    return W1, B1, W2, B2
+    Y_onehot = one_hot(df[i, 0])
+    dZ2 = A2 - Y_one_hot    #Cost + softmax function derivative
+    dW2 = dZ2 @ A1.T    # for each image trained, dW2 = (1/m) * (dZ2 @ A1.T) for batch size m
+    dB2 = dZ2
+
+
+
+
+    return dW1, dB1, dW2, dB2
 
 def main():
     W1, B1, W2, B2 = initparams()   #Initialize Parameters
 
     csv_num_row = 0 # Row 1 (image 1)
-    data_row = pixel_matrix_norm[csv_num_row]  # get first row
+    data_row = pixel_matrix_norm[csv_num_row]  # get first row and assign to data_row
     X = data_row.reshape(784, 1) # reshape row to column
 
     # for i in range(100):
