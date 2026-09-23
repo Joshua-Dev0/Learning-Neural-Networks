@@ -61,6 +61,7 @@ def accuracy(result: np.ndarray, onehot: np.ndarray):
   return prediction == actual
 
 
+
 def forward_propagation(X: np.ndarray, W1: np.ndarray, B1: np.ndarray, W2: np.ndarray, B2: np.ndarray):
   # Pass 1: Hidden Layer calculation (Outputs a 64x1 matrix)
   Z1 = (W1 @ X) + B1  # ([64x784] * [784x1]) + [64x1] = [64x1]
@@ -130,14 +131,17 @@ def main():
   while cont == 1:
     print("Options ====================")
     print("- R for Train")
-    print("- S for Test")
+    print("- T for Test")
+    print("- L for Load")
+    print("- S for Save")
     option = input("Select an option: ")
     
     if(option == "R"):
       iterations = int(input("Iterations: "))
       alpha = 0.01
       W1, B1, W2, B2 = gradient_descent(iterations, alpha, W1, B1, W2, B2)
-    elif(option == "S"):
+      
+    elif(option == "T"):
       index = int(input("Select Index: "))
       X = ts_norm[index].reshape(784, 1)
       A2, Z2, A1, Z1 = forward_propagation(X, W1, B1, W2, B2)
@@ -173,6 +177,23 @@ def main():
       plt.imshow(imageGrid, cmap='gray') # 3. Plot the image using a grayscale color map ('gray')
       plt.axis('off') # 4. (Optional) Turn off the coordinate axis lines for a cleaner look
       plt.show() # 5. Display the window on your screen
+      
+    elif(option == "L"):
+      model = np.load("model.npz")
+      W1 = model["W1"]
+      B1 = model["B1"]
+      W2 = model["W2"]
+      B2 = model["B2"]
+  
+    elif(option == "S"):
+      np.savez(
+        "model.npz",
+        W1=W1,
+        B1=B1,
+        W2=W2,
+        B2=B2
+      )
+      
     else:
       print("Invalid Input")
       
