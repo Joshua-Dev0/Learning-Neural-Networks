@@ -16,7 +16,7 @@ B2 = model["B2"]
 class NativeMNISTCanvas:
     def __init__(self, root):
         self.root = root
-        self.root.title("28x28 Native MNIST Drawer (0-255)")
+        self.root.title("28x28 AI Digit recognizer")
         
         self.grid_size = 28
         self.pixel_scale = 16
@@ -24,10 +24,23 @@ class NativeMNISTCanvas:
         
         self.pixel_grid = np.zeros((self.grid_size, self.grid_size), dtype=np.float32)
         
-        self.canvas = tk.Canvas(root, width=self.canvas_dim, height=self.canvas_dim, bg="black")
+        self.canvas = tk.Canvas(
+            root,
+            width=self.canvas_dim,
+            height=self.canvas_dim,
+            bg="black"
+        )
         self.canvas.pack(pady=10)
-        
+
         self.draw_grid_lines()
+
+        # Prediction text underneath the canvas
+        self.prediction_label = tk.Label(
+            root,
+            text="Prediction: -",
+            font=("Arial", 15)
+        )
+        self.prediction_label.pack(pady=10)
             
         self.canvas.bind("<B1-Motion>", self.paint_brush)
         self.canvas.bind("<Button-1>", self.paint_brush)
@@ -75,11 +88,17 @@ class NativeMNISTCanvas:
     def output_vector(self):
         flat_array = self.pixel_grid.flatten()
         X = flat_array.reshape(784, 1)
-        
+
+        # If your model was trained with normalized pixels:
+        X = X / 255.0
+
         A2, Z2, A1, Z1 = forward_propagation(X, W1, B1, W2, B2)
         digit = np.argmax(A2)
-        print("Predicted digit:", digit)
         
+        # Update the text on the GUI
+        self.prediction_label.config(
+            text=f"Prediction: {digit}"
+        )
 
         global native_mnist_input
         native_mnist_input = X
